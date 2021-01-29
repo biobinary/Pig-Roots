@@ -1,0 +1,286 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://assets/FontAssets/FFFFORWA.TTF" type="DynamicFontData" id=1]
+[ext_resource path="res://src/UserInterface/Script/LevelPickerScript.gd" type="Script" id=2]
+[ext_resource path="res://assets/Effect/ShaderTexture.png" type="Texture" id=3]
+[ext_resource path="res://assets/SoundAssets/ButtonClickEffect.wav" type="AudioStream" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float screen_width = 1024;
+uniform float screen_height = 600;
+
+// Curvature
+uniform float BarrelPower =1.1;
+// Color bleeding
+uniform float color_bleeding = 1.2;
+uniform float bleeding_range_x = 3;
+uniform float bleeding_range_y = 3;
+// Scanline
+uniform float lines_distance = 4.0;
+uniform float scan_size = 2.0;
+uniform float scanline_alpha = 0.9;
+uniform float lines_velocity = 30.0;
+
+vec2 distort(vec2 p) 
+{
+	float angle = p.y / p.x;
+	float theta = atan(p.y,p.x);
+	float radius = pow(length(p), BarrelPower);
+	
+	p.x = radius * cos(theta);
+	p.y = radius * sin(theta);
+	
+	return 0.5 * (p + vec2(1.0,1.0));
+}
+
+void get_color_bleeding(inout vec4 current_color,inout vec4 color_left){
+	current_color = current_color*vec4(color_bleeding,0.5,1.0-color_bleeding,1);
+	color_left = color_left*vec4(1.0-color_bleeding,0.5,color_bleeding,1);
+}
+
+void get_color_scanline(vec2 uv,inout vec4 c,float time){
+	float line_row = floor((uv.y * screen_height/scan_size) + mod(time*lines_velocity, lines_distance));
+	float n = 1.0 - ceil((mod(line_row,lines_distance)/lines_distance));
+	c = c - n*c*(1.0 - scanline_alpha);
+	c.a = 1.0;
+}
+
+void fragment()
+{
+	vec2 xy = SCREEN_UV * 2.0;
+	xy.x -= 1.0;
+	xy.y -= 1.0;
+	
+	float d = length(xy);
+	if(d < 1.5){
+		xy = distort(xy);
+	}
+	else{
+		xy = SCREEN_UV;
+	}
+	
+	float pixel_size_x = 1.0/screen_width*bleeding_range_x;
+	float pixel_size_y = 1.0/screen_height*bleeding_range_y;
+	vec4 color_left = texture(SCREEN_TEXTURE,xy - vec2(pixel_size_x, pixel_size_y));
+	vec4 current_color = texture(SCREEN_TEXTURE,xy);
+	get_color_bleeding(current_color,color_left);
+	vec4 c = current_color+color_left;
+	get_color_scanline(xy,c,TIME);
+	COLOR = c;
+
+}"
+custom_defines = ""
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/screen_width = 1024.0
+shader_param/screen_height = 600.0
+shader_param/BarrelPower = 1.01
+shader_param/color_bleeding = 1.2
+shader_param/bleeding_range_x = 1.0
+shader_param/bleeding_range_y = 1.0
+shader_param/lines_distance = 4.0
+shader_param/scan_size = 0.5
+shader_param/scanline_alpha = 0.9
+shader_param/lines_velocity = 30.0
+
+[sub_resource type="DynamicFont" id=3]
+size = 24
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.0431373, 0.0470588, 0.211765, 0 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 10
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=7]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=8]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=9]
+draw_center = false
+
+[sub_resource type="DynamicFont" id=10]
+size = 12
+font_data = ExtResource( 1 )
+
+[sub_resource type="Animation" id=11]
+resource_name = "OpenUpCover"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Cover:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 256, 175.21 ), Vector2( 256, -5.40956 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Cover:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 32, 21.9384 ), Vector2( 32, -0.306971 ) ]
+}
+
+[node name="LevelPicker" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ButtonClickSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="ShaderEffect" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="ShaderEffect"]
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -141.0
+margin_top = -80.0
+margin_right = 141.0
+margin_bottom = 80.0
+custom_constants/separation = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+margin_right = 282.0
+margin_bottom = 33.0
+custom_fonts/font = SubResource( 3 )
+custom_colors/font_color = Color( 0.160784, 0.541176, 0.568627, 1 )
+text = "Select Difficulty..."
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LevelSelectorContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 43.0
+margin_right = 282.0
+margin_bottom = 160.0
+size_flags_vertical = 3
+custom_constants/separation = 25
+alignment = 1
+
+[node name="Easy" type="Button" parent="VBoxContainer/LevelSelectorContainer"]
+margin_top = 51.0
+margin_right = 77.0
+margin_bottom = 66.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+custom_styles/hover = SubResource( 4 )
+custom_styles/pressed = SubResource( 4 )
+custom_styles/focus = SubResource( 4 )
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
+custom_colors/font_color_hover = Color( 0.282353, 0.764706, 0.541176, 1 )
+custom_colors/font_color_pressed = Color( 0.282353, 0.764706, 0.541176, 1 )
+text = "Easy"
+
+[node name="Medium" type="Button" parent="VBoxContainer/LevelSelectorContainer"]
+margin_left = 102.0
+margin_top = 51.0
+margin_right = 179.0
+margin_bottom = 66.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+custom_styles/hover = SubResource( 4 )
+custom_styles/pressed = SubResource( 4 )
+custom_styles/focus = SubResource( 4 )
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
+custom_colors/font_color_hover = Color( 0.282353, 0.764706, 0.541176, 1 )
+custom_colors/font_color_pressed = Color( 0.282353, 0.764706, 0.541176, 1 )
+text = "Medium"
+
+[node name="Hard" type="Button" parent="VBoxContainer/LevelSelectorContainer"]
+margin_left = 204.0
+margin_top = 51.0
+margin_right = 282.0
+margin_bottom = 66.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+custom_styles/hover = SubResource( 4 )
+custom_styles/pressed = SubResource( 4 )
+custom_styles/focus = SubResource( 4 )
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
+custom_colors/font_color_hover = Color( 0.282353, 0.764706, 0.541176, 1 )
+custom_colors/font_color_pressed = Color( 0.282353, 0.764706, 0.541176, 1 )
+text = "Hard"
+
+[node name="BackButton" type="Button" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = -30.0
+margin_right = 69.0
+margin_bottom = -10.0
+mouse_default_cursor_shape = 2
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/normal = SubResource( 9 )
+custom_fonts/font = SubResource( 10 )
+custom_colors/font_color_hover = Color( 0.282353, 0.764706, 0.541176, 1 )
+custom_colors/font_color_pressed = Color( 0.282353, 0.764706, 0.541176, 1 )
+text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Cover" type="Sprite" parent="."]
+self_modulate = Color( 0.160784, 0.482353, 0.466667, 1 )
+position = Vector2( 256, 175.21 )
+scale = Vector2( 32, 21.9384 )
+texture = ExtResource( 3 )
+
+[node name="TransitionsAnimation" type="AnimationPlayer" parent="."]
+autoplay = "OpenUpCover"
+anims/OpenUpCover = SubResource( 11 )
+[connection signal="pressed" from="VBoxContainer/LevelSelectorContainer/Easy" to="." method="_on_Easy_pressed"]
+[connection signal="pressed" from="VBoxContainer/LevelSelectorContainer/Medium" to="." method="_on_Medium_pressed"]
+[connection signal="pressed" from="VBoxContainer/LevelSelectorContainer/Hard" to="." method="_on_Hard_pressed"]
+[connection signal="pressed" from="BackButton" to="." method="_on_BackButton_pressed"]

@@ -1,0 +1,110 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/FontAssets/FFFFORWA.TTF" type="DynamicFontData" id=1]
+[ext_resource path="res://src/UserInterface/Script/GameUserInterfaceScript.gd" type="Script" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=2]
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 10
+font_data = ExtResource( 1 )
+
+[sub_resource type="Animation" id=4]
+resource_name = "DangerTime"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("MarginContainer/VBoxContainer/TimerLabel:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("MarginContainer/VBoxContainer/TimerLabel:custom_fonts/font:size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 10, 15 ]
+}
+
+[node name="GameUserInterface" type="Control"]
+anchor_left = -0.5
+anchor_top = -0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 128.0
+margin_top = 80.0
+margin_right = 128.0
+margin_bottom = 80.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="XPLabel" type="Label" parent="."]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 66.0
+margin_bottom = 42.0
+custom_fonts/font = SubResource( 1 )
+text = "0 Pts"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_top = 20
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_top = 20.0
+margin_right = 768.0
+margin_bottom = 480.0
+custom_constants/separation = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="QuestionLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+margin_right = 768.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 2 )
+text = "sqrt(144) = . . ."
+align = 1
+
+[node name="TimerLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+margin_top = 27.0
+margin_right = 768.0
+margin_bottom = 42.0
+custom_fonts/font = SubResource( 3 )
+text = "00:59"
+align = 1
+
+[node name="TimerNode" type="Node" parent="."]
+
+[node name="Timer" type="Timer" parent="TimerNode"]
+process_mode = 0
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/DangerTime = SubResource( 4 )
+[connection signal="timeout" from="TimerNode/Timer" to="." method="_on_Timer_timeout"]

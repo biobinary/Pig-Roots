@@ -1,0 +1,256 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://assets/FontAssets/FFFFORWA.TTF" type="DynamicFontData" id=1]
+[ext_resource path="res://assets/Sprites/01-King Human/Dead (78x58).png" type="Texture" id=2]
+[ext_resource path="res://assets/Effect/ShaderTexture.png" type="Texture" id=3]
+[ext_resource path="res://src/UserInterface/Script/TimeoutMenuScript.gd" type="Script" id=4]
+[ext_resource path="res://assets/SoundAssets/ButtonClickEffect.wav" type="AudioStream" id=5]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float screen_width = 1024;
+uniform float screen_height = 600;
+
+// Curvature
+uniform float BarrelPower =1.1;
+// Color bleeding
+uniform float color_bleeding = 1.2;
+uniform float bleeding_range_x = 3;
+uniform float bleeding_range_y = 3;
+// Scanline
+uniform float lines_distance = 4.0;
+uniform float scan_size = 2.0;
+uniform float scanline_alpha = 0.9;
+uniform float lines_velocity = 30.0;
+
+vec2 distort(vec2 p) 
+{
+	float angle = p.y / p.x;
+	float theta = atan(p.y,p.x);
+	float radius = pow(length(p), BarrelPower);
+	
+	p.x = radius * cos(theta);
+	p.y = radius * sin(theta);
+	
+	return 0.5 * (p + vec2(1.0,1.0));
+}
+
+void get_color_bleeding(inout vec4 current_color,inout vec4 color_left){
+	current_color = current_color*vec4(color_bleeding,0.5,1.0-color_bleeding,1);
+	color_left = color_left*vec4(1.0-color_bleeding,0.5,color_bleeding,1);
+}
+
+void get_color_scanline(vec2 uv,inout vec4 c,float time){
+	float line_row = floor((uv.y * screen_height/scan_size) + mod(time*lines_velocity, lines_distance));
+	float n = 1.0 - ceil((mod(line_row,lines_distance)/lines_distance));
+	c = c - n*c*(1.0 - scanline_alpha);
+	c.a = 1.0;
+}
+
+void fragment()
+{
+	vec2 xy = SCREEN_UV * 2.0;
+	xy.x -= 1.0;
+	xy.y -= 1.0;
+	
+	float d = length(xy);
+	if(d < 1.5){
+		xy = distort(xy);
+	}
+	else{
+		xy = SCREEN_UV;
+	}
+	
+	float pixel_size_x = 1.0/screen_width*bleeding_range_x;
+	float pixel_size_y = 1.0/screen_height*bleeding_range_y;
+	vec4 color_left = texture(SCREEN_TEXTURE,xy - vec2(pixel_size_x, pixel_size_y));
+	vec4 current_color = texture(SCREEN_TEXTURE,xy);
+	get_color_bleeding(current_color,color_left);
+	vec4 c = current_color+color_left;
+	get_color_scanline(xy,c,TIME);
+	COLOR = c;
+
+}"
+custom_defines = ""
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/screen_width = 1024.0
+shader_param/screen_height = 600.0
+shader_param/BarrelPower = 1.01
+shader_param/color_bleeding = 1.2
+shader_param/bleeding_range_x = 1.0
+shader_param/bleeding_range_y = 1.0
+shader_param/lines_distance = 4.0
+shader_param/scan_size = 0.5
+shader_param/scanline_alpha = 0.9
+shader_param/lines_velocity = 30.0
+
+[sub_resource type="DynamicFont" id=3]
+size = 24
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 14
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 8
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=6]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=7]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=8]
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id=9]
+draw_center = false
+
+[sub_resource type="DynamicFont" id=10]
+size = 12
+font_data = ExtResource( 1 )
+
+[sub_resource type="Animation" id=11]
+tracks/0/type = "value"
+tracks/0/path = NodePath("Cover:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 256, 175.21 ), Vector2( 256, -5.40956 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Cover:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 32, 21.9384 ), Vector2( 32, -0.306971 ) ]
+}
+
+[node name="TimeoutMenu" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ShaderEffect" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="ShaderEffect"]
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ButtonClickEffect" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="."]
+margin_left = 52.2793
+margin_top = 75.5953
+margin_right = 190.279
+margin_bottom = 108.595
+custom_fonts/font = SubResource( 3 )
+text = "TimeOut!"
+
+[node name="Stats" type="VBoxContainer" parent="."]
+margin_left = 258.746
+margin_top = 75.5953
+margin_right = 298.746
+margin_bottom = 115.595
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ResultTitle" type="Label" parent="Stats"]
+margin_right = 191.0
+margin_bottom = 20.0
+custom_fonts/font = SubResource( 4 )
+text = "Result : "
+
+[node name="Points" type="Label" parent="Stats"]
+margin_top = 24.0
+margin_right = 191.0
+margin_bottom = 35.0
+custom_fonts/font = SubResource( 5 )
+text = "points = 0"
+
+[node name="CorrectPercentage" type="Label" parent="Stats"]
+margin_top = 39.0
+margin_right = 191.0
+margin_bottom = 50.0
+custom_fonts/font = SubResource( 5 )
+text = "percentage of correct answers =  0%"
+
+[node name="Summary" type="Label" parent="Stats"]
+margin_top = 54.0
+margin_right = 191.0
+margin_bottom = 65.0
+custom_fonts/font = SubResource( 5 )
+text = "grade = A"
+
+[node name="ReturnToHomeButton" type="Button" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = -30.0
+margin_right = 69.0
+margin_bottom = -10.0
+mouse_default_cursor_shape = 2
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/normal = SubResource( 9 )
+custom_fonts/font = SubResource( 10 )
+custom_colors/font_color_hover = Color( 0.282353, 0.764706, 0.541176, 1 )
+custom_colors/font_color_pressed = Color( 0.282353, 0.764706, 0.541176, 1 )
+text = "Return To Home"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CharacterDeathSprite" type="Sprite" parent="."]
+position = Vector2( 137, 145.321 )
+scale = Vector2( 1.5, 1.5 )
+texture = ExtResource( 2 )
+hframes = 4
+frame = 3
+
+[node name="Cover" type="Sprite" parent="."]
+self_modulate = Color( 0.160784, 0.482353, 0.466667, 1 )
+position = Vector2( 256, 175.21 )
+scale = Vector2( 32, 21.9384 )
+texture = ExtResource( 3 )
+
+[node name="TransitionsAnimation" type="AnimationPlayer" parent="."]
+autoplay = "OpenUpCover"
+anims/OpenUpCover = SubResource( 11 )
+[connection signal="pressed" from="ReturnToHomeButton" to="." method="_on_ReturnToHomeButton_pressed"]

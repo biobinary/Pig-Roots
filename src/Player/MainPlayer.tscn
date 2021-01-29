@@ -1,0 +1,459 @@
+[gd_scene load_steps=39 format=2]
+
+[ext_resource path="res://assets/Sprites/01-King Human/Run (78x58).png" type="Texture" id=1]
+[ext_resource path="res://src/Player/Script/MainPlayerScript.gd" type="Script" id=2]
+[ext_resource path="res://assets/Sprites/01-King Human/Idle (78x58).png" type="Texture" id=3]
+[ext_resource path="res://assets/Sprites/01-King Human/Attack (78x58).png" type="Texture" id=4]
+[ext_resource path="res://assets/Sprites/01-King Human/Jump (78x58).png" type="Texture" id=5]
+[ext_resource path="res://assets/Effect/ShaderTexture.png" type="Texture" id=6]
+[ext_resource path="res://src/Player/Script/HammerHitBoxScript.gd" type="Script" id=7]
+[ext_resource path="res://assets/SoundAssets/JumpSoundEffect.wav" type="AudioStream" id=8]
+[ext_resource path="res://assets/SoundAssets/HammerHitEffect.wav" type="AudioStream" id=9]
+[ext_resource path="res://assets/SoundAssets/FootStepSound.wav" type="AudioStream" id=10]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 5.01865, 12.4001 )
+
+[sub_resource type="Animation" id=2]
+resource_name = "Attack"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ ExtResource( 4 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:region_enabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:region_rect")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ Rect2( -21, -1, 100, 59 ), Rect2( 81, -7, 71, 62 ), Rect2( 165, 16, 37, 28 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ Vector2( 0, 0 ), Vector2( 10.895, -4.238 ), Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("HammerHitBox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.02, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true, true ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("HammerHitBox/CollisionShape2D:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 34.8839, 3.80611 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "AttackLeftDirection"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ ExtResource( 4 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:region_enabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:region_rect")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ Rect2( -21, -1, 100, 59 ), Rect2( 81, -7, 71, 62 ), Rect2( 165, 16, 37, 28 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ Vector2( 0, 0 ), Vector2( -10.4602, -4.238 ), Vector2( 0, 0 ), Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("HammerHitBox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.02, 0.2, 0.3 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true, true ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("HammerHitBox/CollisionShape2D:position")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( -34.884, 3.806 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "Idle"
+length = 1.1
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ ExtResource( 3 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:region_rect")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.09, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ Rect2( 9, 18, 37, 26 ), Rect2( 87, 18, 37, 26 ), Rect2( 165, 18, 37, 26 ), Rect2( 243, 18, 37, 26 ), Rect2( 321, 18, 37, 26 ), Rect2( 399, 18, 37, 26 ), Rect2( 477, 17, 37, 27 ), Rect2( 555, 16, 37, 28 ), Rect2( 633, 16, 37, 28 ), Rect2( 711, 17, 37, 27 ), Rect2( 789, 18, 37, 26 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:region_enabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "Jump"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ ExtResource( 5 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:region_enabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:region_rect")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Rect2( 9, 15, 37, 29 ) ]
+}
+
+[sub_resource type="Animation" id=6]
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ ExtResource( 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:region_enabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:region_rect")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.13, 0.25, 0.38, 0.5, 0.63, 0.75, 0.88 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ Rect2( 9, 18, 37, 25 ), Rect2( 87, 16, 37, 26 ), Rect2( 165, 17, 37, 26 ), Rect2( 243, 20, 37, 25 ), Rect2( 321, 18, 37, 25 ), Rect2( 399, 16, 37, 26 ), Rect2( 477, 17, 37, 26 ), Rect2( 555, 20, 37, 25 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("SoundEffect/FootStepSound:playing")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0.116069, 0.63 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, true ]
+}
+
+[sub_resource type="AnimationNodeAnimation" id=7]
+animation = "Attack"
+
+[sub_resource type="AnimationNodeAnimation" id=8]
+animation = "AttackLeftDirection"
+
+[sub_resource type="AnimationNodeAnimation" id=9]
+animation = "Idle"
+
+[sub_resource type="AnimationNodeAnimation" id=10]
+animation = "Jump"
+
+[sub_resource type="AnimationNodeAnimation" id=11]
+animation = "Run"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=12]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=13]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=14]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=15]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=16]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=17]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=18]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=19]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=20]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=21]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=22]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=23]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=24]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=25]
+
+[sub_resource type="AnimationNodeStateMachine" id=26]
+states/Attack/node = SubResource( 7 )
+states/Attack/position = Vector2( 622, 346 )
+states/AttackLeftDirection/node = SubResource( 8 )
+states/AttackLeftDirection/position = Vector2( 28, 410 )
+states/Idle/node = SubResource( 9 )
+states/Idle/position = Vector2( 174, 70 )
+states/Jump/node = SubResource( 10 )
+states/Jump/position = Vector2( 300.845, 397 )
+states/Run/node = SubResource( 11 )
+states/Run/position = Vector2( 461, 70 )
+transitions = [ "Idle", "Run", SubResource( 12 ), "Run", "Idle", SubResource( 13 ), "Idle", "Attack", SubResource( 14 ), "Attack", "Idle", SubResource( 15 ), "Run", "Attack", SubResource( 16 ), "Idle", "AttackLeftDirection", SubResource( 17 ), "AttackLeftDirection", "Idle", SubResource( 18 ), "Run", "AttackLeftDirection", SubResource( 19 ), "Idle", "Jump", SubResource( 20 ), "Jump", "Idle", SubResource( 21 ), "Run", "Jump", SubResource( 22 ), "Jump", "Run", SubResource( 23 ), "Jump", "Attack", SubResource( 24 ), "Jump", "AttackLeftDirection", SubResource( 25 ) ]
+start_node = "Idle"
+graph_offset = Vector2( -281.155, -108.434 )
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=27]
+
+[sub_resource type="RectangleShape2D" id=28]
+extents = Vector2( 9.56114, 6.70832 )
+
+[node name="MainPlayer" type="KinematicBody2D"]
+pause_mode = 1
+collision_layer = 2
+collision_mask = 5
+script = ExtResource( 2 )
+player_speed = 100.0
+jump_force = 300.0
+player_acceleration = 6.0
+player_friction = 5.0
+air_friction = 4.5
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 243, 18, 37, 26 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 3.487, 0 )
+shape = SubResource( 1 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/Attack = SubResource( 2 )
+anims/AttackLeftDirection = SubResource( 3 )
+anims/Idle = SubResource( 4 )
+anims/Jump = SubResource( 5 )
+anims/Run = SubResource( 6 )
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource( 26 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+process_mode = 0
+parameters/playback = SubResource( 27 )
+
+[node name="HammerHitBox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource( 7 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HammerHitBox"]
+self_modulate = Color( 0.313726, 0, 1, 1 )
+position = Vector2( 34.8839, 3.80611 )
+shape = SubResource( 28 )
+disabled = true
+
+[node name="TimerNode" type="Node" parent="."]
+
+[node name="AttackCooldown" type="Timer" parent="TimerNode"]
+process_mode = 0
+wait_time = 0.75
+
+[node name="NodePlayerDirectionPositioning" type="Node2D" parent="."]
+position = Vector2( 3.487, 0 )
+
+[node name="AttackStamina" type="Control" parent="NodePlayerDirectionPositioning"]
+margin_left = -15.3923
+margin_top = -22.7329
+margin_right = 14.6077
+margin_bottom = -18.7329
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureProgress" type="TextureProgress" parent="NodePlayerDirectionPositioning/AttackStamina"]
+self_modulate = Color( 0.0588235, 0.72549, 0.733333, 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+value = 100.0
+texture_progress = ExtResource( 6 )
+nine_patch_stretch = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tween" type="Tween" parent="NodePlayerDirectionPositioning/AttackStamina"]
+playback_process_mode = 0
+
+[node name="DustParticleSpawner" type="Position2D" parent="NodePlayerDirectionPositioning"]
+position = Vector2( 0, 3.80611 )
+
+[node name="SoundEffect" type="Node" parent="."]
+
+[node name="JumpSound" type="AudioStreamPlayer" parent="SoundEffect"]
+stream = ExtResource( 8 )
+
+[node name="HammerHitEffect" type="AudioStreamPlayer" parent="SoundEffect"]
+stream = ExtResource( 9 )
+
+[node name="FootStepSound" type="AudioStreamPlayer" parent="SoundEffect"]
+stream = ExtResource( 10 )
+volume_db = -5.0
+[connection signal="body_entered" from="HammerHitBox" to="HammerHitBox" method="_on_HammerHitBox_body_entered"]
+[connection signal="timeout" from="TimerNode/AttackCooldown" to="." method="_on_AttackCooldown_timeout"]

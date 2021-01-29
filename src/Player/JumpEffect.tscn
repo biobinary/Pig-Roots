@@ -1,0 +1,23 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://assets/Effect/Jump 06.png" type="Texture" id=1]
+[ext_resource path="res://assets/Effect/Jump 01.png" type="Texture" id=2]
+[ext_resource path="res://assets/Effect/Jump 05.png" type="Texture" id=3]
+[ext_resource path="res://assets/Effect/Jump 03.png" type="Texture" id=4]
+[ext_resource path="res://assets/Effect/Jump 04.png" type="Texture" id=5]
+[ext_resource path="res://assets/Effect/Jump 02.png" type="Texture" id=6]
+[ext_resource path="res://src/Player/Script/JumpEffectScript.gd" type="Script" id=7]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 2 ), ExtResource( 6 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 3 ), ExtResource( 1 ), null ],
+"loop": false,
+"name": "Idle",
+"speed": 10.0
+} ]
+
+[node name="JumpEffect" type="AnimatedSprite"]
+frames = SubResource( 1 )
+animation = "Idle"
+script = ExtResource( 7 )
+[connection signal="animation_finished" from="." to="." method="_on_JumpEffect_animation_finished"]

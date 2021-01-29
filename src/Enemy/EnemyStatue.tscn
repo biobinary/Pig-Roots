@@ -1,0 +1,95 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/Sprites/03-Pig/Hit (34x28).png" type="Texture" id=1]
+[ext_resource path="res://assets/FontAssets/FFFFORWA.TTF" type="DynamicFontData" id=6]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+uniform bool Smooth = true;
+uniform float width : hint_range(0.0, 16) = 1.0;
+uniform vec4 outline_color : hint_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform int pixel_size : hint_range(1, 10) = 4;
+ 
+void fragment()
+{
+	vec2 unit = (1.0/float(pixel_size) ) / vec2(textureSize(TEXTURE, 0));
+	vec4 pixel_color = texture(TEXTURE, UV);
+	if (pixel_color.a == 0.0) {
+		pixel_color = outline_color;
+		pixel_color.a = 0.0;
+		for (float x = -ceil(width); x <= ceil(width); x++) {
+			for (float y = -ceil(width); y <= ceil(width); y++) {
+				if (texture(TEXTURE, UV + vec2(x*unit.x, y*unit.y)).a == 0.0 || (x==0.0 && y==0.0)) {
+					continue;
+				}
+				if (Smooth) {
+					pixel_color.a += outline_color.a / (pow(x,2)+pow(y,2)) * (1.0-pow(2.0, -width));
+					if (pixel_color.a > 1.0) {
+						pixel_color.a = 1.0;
+					}
+				} else {
+					pixel_color.a = outline_color.a;
+					return
+				}
+			}
+		}
+	}
+	COLOR = pixel_color;
+}"
+custom_defines = ""
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/Smooth = false
+shader_param/width = 3.0
+shader_param/outline_color = Color( 0.219608, 2, 0, 1 )
+shader_param/pixel_size = 4
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 7.12326, 8.7102 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 6
+font_data = ExtResource( 6 )
+
+[node name="Enemy" type="KinematicBody2D"]
+collision_layer = 4
+collision_mask = 11
+
+[node name="Sprite" type="Sprite" parent="."]
+material = SubResource( 2 )
+texture = ExtResource( 1 )
+hframes = 2
+frame = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+self_modulate = Color( 0.0313726, 0, 1, 1 )
+position = Vector2( 2.835, 5.355 )
+shape = SubResource( 3 )
+
+[node name="Position2D" type="Position2D" parent="CollisionShape2D"]
+
+[node name="CenterContainer" type="CenterContainer" parent="CollisionShape2D/Position2D"]
+margin_left = -47.6637
+margin_top = -21.1181
+margin_right = 51.3363
+margin_bottom = -12.1181
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnswerLabel" type="Label" parent="CollisionShape2D/Position2D/CenterContainer"]
+margin_left = 45.0
+margin_right = 53.0
+margin_bottom = 9.0
+custom_fonts/font = SubResource( 4 )
+text = "12"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tween" type="Tween" parent="."]
+playback_process_mode = 0

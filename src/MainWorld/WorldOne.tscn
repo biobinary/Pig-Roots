@@ -1,0 +1,205 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://src/MainWorld/WorldObjectsTwo.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/MainWorld/Script/MainWorldScript.gd" type="Script" id=2]
+[ext_resource path="res://src/Player/MainPlayer.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/Effect/ShaderTexture.png" type="Texture" id=4]
+[ext_resource path="res://src/UserInterface/GameUserInterface.tscn" type="PackedScene" id=5]
+[ext_resource path="res://src/MainWorld/Script/GameCameraScript.gd" type="Script" id=6]
+
+[sub_resource type="Environment" id=1]
+background_mode = 4
+glow_enabled = true
+glow_strength = 0.7
+glow_blend_mode = 0
+
+[sub_resource type="Animation" id=2]
+resource_name = "CoverUp"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Cover:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 256, 166.236 ), Vector2( 256, -80 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Cover:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 48, 30.7795 ), Vector2( 48, 0 ) ]
+}
+
+[sub_resource type="Shader" id=3]
+code = "shader_type canvas_item;
+
+uniform float screen_width = 1024;
+uniform float screen_height = 600;
+
+// Curvature
+uniform float BarrelPower =1.1;
+// Color bleeding
+uniform float color_bleeding = 1.2;
+uniform float bleeding_range_x = 3;
+uniform float bleeding_range_y = 3;
+// Scanline
+uniform float lines_distance = 4.0;
+uniform float scan_size = 2.0;
+uniform float scanline_alpha = 0.9;
+uniform float lines_velocity = 30.0;
+
+vec2 distort(vec2 p) 
+{
+	float angle = p.y / p.x;
+	float theta = atan(p.y,p.x);
+	float radius = pow(length(p), BarrelPower);
+	
+	p.x = radius * cos(theta);
+	p.y = radius * sin(theta);
+	
+	return 0.5 * (p + vec2(1.0,1.0));
+}
+
+void get_color_bleeding(inout vec4 current_color,inout vec4 color_left){
+	current_color = current_color*vec4(color_bleeding,0.5,1.0-color_bleeding,1);
+	color_left = color_left*vec4(1.0-color_bleeding,0.5,color_bleeding,1);
+}
+
+void get_color_scanline(vec2 uv,inout vec4 c,float time){
+	float line_row = floor((uv.y * screen_height/scan_size) + mod(time*lines_velocity, lines_distance));
+	float n = 1.0 - ceil((mod(line_row,lines_distance)/lines_distance));
+	c = c - n*c*(1.0 - scanline_alpha);
+	c.a = 1.0;
+}
+
+void fragment()
+{
+	vec2 xy = SCREEN_UV * 2.0;
+	xy.x -= 1.0;
+	xy.y -= 1.0;
+	
+	float d = length(xy);
+	if(d < 1.5){
+		xy = distort(xy);
+	}
+	else{
+		xy = SCREEN_UV;
+	}
+	
+	float pixel_size_x = 1.0/screen_width*bleeding_range_x;
+	float pixel_size_y = 1.0/screen_height*bleeding_range_y;
+	vec4 color_left = texture(SCREEN_TEXTURE,xy - vec2(pixel_size_x, pixel_size_y));
+	vec4 current_color = texture(SCREEN_TEXTURE,xy);
+	get_color_bleeding(current_color,color_left);
+	vec4 c = current_color+color_left;
+	get_color_scanline(xy,c,TIME);
+	COLOR = c;
+
+}"
+custom_defines = ""
+
+[sub_resource type="ShaderMaterial" id=4]
+shader = SubResource( 3 )
+shader_param/screen_width = 1024.0
+shader_param/screen_height = 600.0
+shader_param/BarrelPower = 1.01
+shader_param/color_bleeding = 1.2
+shader_param/bleeding_range_x = 1.0
+shader_param/bleeding_range_y = 1.0
+shader_param/lines_distance = 4.0
+shader_param/scan_size = 0.5
+shader_param/scanline_alpha = 0.9
+shader_param/lines_velocity = 30.0
+
+[node name="MainWorld" type="Node"]
+pause_mode = 2
+script = ExtResource( 2 )
+player_node_path = NodePath("MainPlayer")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="GameCamera" type="Camera2D" parent="."]
+position = Vector2( 256, 160 )
+current = true
+zoom = Vector2( 1.5, 1.5 )
+script = ExtResource( 6 )
+background_node_path = NodePath("../GameBackground/BackgroundImage")
+
+[node name="Tween" type="Tween" parent="GameCamera"]
+
+[node name="GameTween" type="Tween" parent="."]
+
+[node name="TransitionsLayer" type="CanvasLayer" parent="."]
+layer = 90
+
+[node name="Cover" type="Sprite" parent="TransitionsLayer"]
+self_modulate = Color( 0.160784, 0.482353, 0.466667, 1 )
+position = Vector2( 256, 166.236 )
+scale = Vector2( 48, 30.7795 )
+texture = ExtResource( 4 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TransitionsLayer"]
+autoplay = "CoverUp"
+playback_process_mode = 0
+anims/CoverUp = SubResource( 2 )
+
+[node name="GameBackground" type="CanvasLayer" parent="."]
+layer = -5
+follow_viewport_enable = true
+
+[node name="BackgroundImage" type="Sprite" parent="GameBackground"]
+modulate = Color( 0, 0, 0, 1 )
+position = Vector2( 257.406, 164.478 )
+scale = Vector2( 63.8514, 40.9851 )
+z_index = -5
+texture = ExtResource( 4 )
+
+[node name="GameUI" type="CanvasLayer" parent="."]
+layer = 5
+follow_viewport_enable = true
+
+[node name="GameUserInterface" parent="GameUI" instance=ExtResource( 5 )]
+anchor_left = -0.25
+anchor_top = -0.25
+anchor_right = 1.25
+anchor_bottom = 1.25
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 0.0
+margin_bottom = 0.0
+
+[node name="ShaderLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Shader" type="TextureRect" parent="ShaderLayer"]
+material = SubResource( 4 )
+margin_left = -128.0
+margin_top = -80.0
+margin_right = 640.0
+margin_bottom = 400.0
+texture = ExtResource( 4 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="EnemyNode" type="Node2D" parent="."]
+pause_mode = 1
+
+[node name="MainPlayer" parent="." instance=ExtResource( 3 )]
+position = Vector2( 40, 168 )
+
+[node name="WorldObjects" parent="." instance=ExtResource( 1 )]
+[connection signal="tween_all_completed" from="GameTween" to="." method="_on_GameTween_tween_all_completed"]
+[connection signal="animation_finished" from="TransitionsLayer/AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
