@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/JumpSoundEffect.wav-6e87c755e4f727aa417c7e20e13446db.sample"
+
+[deps]
+
+source_file="res://assets/SoundAssets/JumpSoundEffect.wav"
+dest_files=[ "res://.import/JumpSoundEffect.wav-6e87c755e4f727aa417c7e20e13446db.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0
